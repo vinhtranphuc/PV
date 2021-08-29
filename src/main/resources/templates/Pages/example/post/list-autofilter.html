@@ -1,0 +1,231 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{../Layouts/example-layout}">
+<head th:include="~{../Fragments/example/head :: title('Post List')}">
+    <style layout:fragment="styles">
+    </style>
+    <th:block layout:fragment="others">
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a onclick="return false;"><i class="fas fa-pen-nib"></i>&ensp;Page Setting</a></li>
+            <li class="breadcrumb-item"><a href="/example/post/list">Post List</a></li>
+        </ol>
+    </nav>
+    <div class="row" style="min-height: 85vh;">
+        <div class="col-md-12 col-sm-12 ">
+            <div class="x_panel h-100">
+                <div class="x_title">
+                    <h2>Post List</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="row pt-3">
+                    	<div class="col-md-2 col-sm-12 form-group pl-3">
+                            <button type="button" class="btn btn-danger blur-color w-50" id="delete-posts">Delete</button>
+                        </div>
+                        <div class="col-md-2 col-sm-12 form-group">
+                            <input id="text-ft" class="form-control" type="text" placeholder="title, summary" required></input>
+							<span style="position: absolute;right:15px;top:10px;" onclick="hideshow()" >
+								<i class="fa fa-search"></i>
+							</span>
+                        </div>
+                        <div class="col-md-1 col-sm-12  form-group">
+                           <select id="categories" class="form-control">
+								<option value="" selected>categories</option>
+						     	<option th:each="category:${categories}"  th:value="${category.category_id}" th:text="${category.category_name}"></option>
+						    </select>
+                        </div>
+                        <div class="col-md-1 col-sm-12  form-group">
+                           <select id="all-user" class="form-control">
+								<option value="" selected>users</option>
+						     	<option value="admin">Admin</option>
+						     	<option value="tranphucvinh">Tran Phuc Vinh</option>
+						    </select>
+                        </div>
+                        <div class="col-md-1 col-sm-12  form-group">
+                           <select id="all-level" class="form-control">
+								<option value="" selected>levels</option>
+						     	<option value="1">Level 1</option>
+						     	<option value="2">Level 2</option>
+						    </select>
+                        </div>
+                        <div class="col-md-2 col-sm-12  form-group">
+                        	<div class='input-group date'>
+                               <input type='text' id="created-date-ft" class="form-control" placeholder="Create date"></input>
+	                            <span class="input-group-addon">
+	                               <span class="fa fa-calendar"></span>
+	                            </span>
+                             </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12  form-group">
+                        	<div class='input-group date'>
+                               <input type='text' id="published-date-ft" class="form-control" placeholder="Published date"></input>
+	                            <span class="input-group-addon">
+	                               <span class="fa fa-calendar"></span>
+	                            </span>
+                             </div>
+                        </div>
+                        <div class="col-md-1 col-sm-12  form-group">
+                           <select id="order-by" class="form-control">
+                           		<option value="" selected>order by</option>
+								<option value="newest">Newest</option>
+						     	<option value="latest">Latest</option>
+						    </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card-box ">
+                                <table id="post-table" class="table jambo_table bulk_action table-bordered"
+                                       style="min-width:100%">
+                                    <thead class="headings">
+	                                    <tr>
+	                                    	<th class="no-sorting text-center">
+					                          <input type="checkbox"></input>
+					                        </th>
+	                                        <th class="text-center">Title</th>
+	                                        <th class="text-center">Category</th>
+	                                        <th class="text-center">Summary</th>
+	                                        <th class="no-sorting text-center">Thumbnail</th>
+	                                        <th class="text-center">Create User</th>
+	                                        <th class="text-center">Create Date</th>
+	                                        <th class="text-center">Published At</th>
+	                                        <th class="text-center no-sorting">Actions</th>
+	                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+var allDataRows = [];
+$(document).ready(function() {
+
+	$('#created-date-ft').datetimepicker({
+		useCurrent: false,
+        format: 'YYYY-MM-DD',
+        showClear: true,
+        useStrict: true,
+        keepInvalid: false
+    });
+
+	$('#published-date-ft').datetimepicker({
+		useCurrent: false,
+        format: 'YYYY-MM-DD',
+        showClear: true,
+        useStrict: true,
+        keepInvalid: false
+    });
+
+	loadPostTable();
+
+	CMTBL.fnc_autoFilterData($('#text-ft'),$("#post-table"),["title","summary"]);
+	CMTBL.fnc_autoFilterData($('#all-user'),$("#post-table"),["created_username"]);
+	CMTBL.fnc_autoFilterData($('#all-level'),$("#post-table"),["level"]);
+	CMTBL.fnc_autoFilterData($('#categories'),$("#post-table"),["category_id"]);
+
+	CMTBL.fnc_autoFilterDataByEvent($('#created-date-ft'),"dp.change",$("#post-table"),["created_at"]);
+	CMTBL.fnc_autoFilterDataByEvent($('#published-date-ft'),"dp.change",$("#post-table"),["published_at"]);
+
+	$('#order-by').on('change',function(e) {
+		if(this.value=='newest') {
+			CMTBL.fnc_sortSingleDate($("#post-table"),"created_at",1);
+			return;
+		}
+		if(this.value=='latest') {
+			CMTBL.fnc_sortSingleDate($("#post-table"),"created_at",0);
+			return;
+		}
+		if(this.value=='') {
+			CMTBL.fnc_sortSingleDate($("#post-table"),"created_at","");
+			return;
+		}
+	});
+
+	$('#delete-posts').click(function() {
+		var postIdArr = getCheckedKeys($('#post-table'));
+		deletePosts(postIdArr);
+	});
+});
+
+function loadPostTable() {
+	var tableCols = [
+		{"data" : "post_id","className" : "text-center","render" : function(data, type, row) {
+				return '<input type="checkbox" value="'+row.post_id+'" class="filled-in chk-col-primary">';
+		}},
+		{"data" : "title","className" : "text-left", "width": "500px"},
+		{"data" : "category_name","className" : "text-left", "width": "400px"},
+		{"data" : "summary","className" : "text-left", "width": "800px"},
+		{"data" : "first_thumbnail","className" : "text-center","width": "300px","render" : function(data, type, row) {
+			return '<img src="'+row.first_thumbnail.image_path+'" alt="" border=3 style="width: 100%;"></img>';
+		}},
+		{"data" : "created_username","className" : "text-left", "width": "300px"},
+		{"data" : "created_at","className" : "text-left", "width": "800px"},
+		{"data" : "published_at","className" : "text-left", "width": "800px"},
+		{"data" : "post_id","className" : "text-center","width": "200px","render" : function(data, type, row) {
+			 return "<div class='action-menu'><ul><li><a onclick='toEditPost("+ row.post_id+")'>Edit</a></li><li><a onclick='deletePost("+ row.post_id+")'>Delete</a></li></ul></div>";
+		}},
+		{"data" : "created_username",visible:false},
+		{"data" : "level",visible:false},
+	];
+	var url = "/example/api/post/list";
+	var tableEle = $("#post-table");
+	CMTBL.fnc_loadDataByGET(url,tableEle,tableCols);
+}
+
+function deletePosts(postIdArr) {
+	if(postIdArr.length < 1)
+		return;
+
+	alertConfirm('Do you want to delete?')
+	.then(function(result) {
+		if (result.value) {
+			  $("#overlay").show();
+			  $.ajax({
+					type: "DELETE"
+					,url: "/example/api/post/delete"
+					,headers: {
+						"Content-Type": "application/json"
+						,"X-HTTP-Method-Override": "DELETE"
+					}
+					,data: JSON.stringify({
+						postIdArr:postIdArr
+					})
+					,dataType: "json"
+					,success: function(data) {
+						$("#overlay").hide();
+						if(data.status == 200) {
+							ALERT.success('Delete success!');
+							loadPostTable();
+						}
+					}
+					,error: function(xhr) {
+						$("#overlay").hide();
+				        if(xhr.responseJSON.message && xhr.responseJSON.message!='') {
+				        	ALERT.warning(xhr.responseJSON.message);
+				        }
+					}
+				});
+	  	}
+	});
+}
+function toEditPost(postId) {
+	window.location.href = "/example/post/edit?postId="+postId
+}
+function deletePost(postId) {
+	var postIdArr = [postId+""];
+	deletePosts(postIdArr);
+}
+</script>

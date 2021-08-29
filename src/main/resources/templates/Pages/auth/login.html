@@ -1,0 +1,252 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{../Layouts/auth-layout}">
+<head th:include="~{../Fragments/head-auth.html :: title('Login')}">
+    <style layout:fragment="styles">
+    	body {
+		  background-image: url("/example/images/auth-bg.jpg");
+		  height: 100%;
+		  background-position: center;
+		  background-repeat: no-repeat;
+		  background-size: cover;
+		}
+		#login-btn {
+		    color: #73879C;
+		    border-color: #73879C;
+		    font-size: 1rem;
+		    font-weight: bold;
+	        border-radius: 20px !important;
+		}
+		#valid-captcha{
+		margin-left: 100px !important;
+		}
+		.was-validated {
+		 margin-top: -10px;
+		 text-align: left;
+		}
+		.login_content {
+		    padding: 200px 0 0;
+		}
+		.login_content h1 {
+	        font-size: 2.5rem;
+		}
+		.login_content label {
+	        font-size: 1rem;
+    		text-shadow: none;
+		}
+		.login_content input {
+            border: none !important;
+		    padding: 15px 20px;
+		    border-radius: 20px !important;
+		    /* background: rgb(255 255 255 / 0.1); */
+		}
+    </style>
+    <th:block layout:fragment="others">
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div>
+        <a class="hiddenanchor" id="signup"></a>
+        <a class="hiddenanchor" id="signin"></a>
+
+        <div class="login_wrapper">
+            <div class="animate form login_form">
+                <section class="login_content">
+                    <form>
+                        <h1>SO JAVA</h1>
+                        <div>
+                            <input id="username" type="text" class="form-control" placeholder="username"/>
+                            <div id="valid-username" class="valid-feedback text-danger"></div>
+                        </div>
+                        <div>
+                            <input id="password" type="password" class="form-control" placeholder="password"/>
+                            <div id="valid-password" class="valid-feedback text-danger"></div>
+                        </div>
+                        <div class="form-group" id="captcha-group"
+                             th:style="${isShowCaptcha==null||isShowCaptcha=='false'?'display:none':'display: block'}">
+                            <div class="input-group-prepend">
+						    <span class="captcha-wrapper">
+						      <img th:src="'data:image/png;base64,'+${captchaEncode}" alt="Responsive image" width="150"
+                                   height="45"/>
+						    </span>
+                                <input type="text" class="form-control" id="captcha" name="captcha"
+                                       placeholder="Enter the letters">
+                            </div>
+                            <div style="margin-left: 155px !important;" id="valid-captcha"
+                                 class="valid-feedback text-danger"></div>
+                        </div>
+                        <div class="checkbox" style="float:left">
+                            <label>
+                                <input id="remember-me" type="checkbox"> Remember me
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <button id="login-btn" type="button" class="btn btn-sm btn-block">Login</button>
+                        </div>
+
+                        <div class="clearfix"></div>
+
+                        <!--<div class="separator">
+                           <p class="change_link">New to site?
+                            <a href="#signup" class="to_register"> Create Account </a>
+                          </p>
+
+                          <div class="clearfix"></div>
+                          <br />
+
+                          <div>
+                            <h1><i class="fa fa-paw"></i> Soteria</h1>
+                            <p>©2020 softone - java team</p>
+                          </div>
+                        </div>-->
+                    </form>
+                </section>
+            </div>
+
+            <!-- <div id="register" class="animate form registration_form">
+              <section class="login_content">
+                <form>
+                  <h1>Create Account</h1>
+                  <div>
+                    <input type="text" class="form-control" placeholder="Username" required="" />
+                  </div>
+                  <div>
+                    <input type="email" class="form-control" placeholder="Email" required="" />
+                  </div>
+                  <div>
+                    <input type="password" class="form-control" placeholder="Password" required="" />
+                  </div>
+                  <div>
+                    <a class="btn btn-default submit" href="index.html">Submit</a>
+                  </div>
+
+                  <div class="clearfix"></div>
+
+                  <div class="separator">
+                    <p class="change_link">Already a member ?
+                      <a href="#signin" class="to_register"> Log in </a>
+                    </p>
+
+                    <div class="clearfix"></div>
+                    <br />
+
+                    <div>
+                      <h1><i class="fa fa-paw"></i> Gentelella Alela!</h1>
+                      <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p>
+                    </div>
+                  </div>
+                </form>
+              </section>
+            </div> -->
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+$( document ).ready(function() {
+	$('#username').keypress(function(e) {
+	    if (e.which == 13) {
+	    	$('#password').focus();
+	    }
+  	});
+	$('#password').keypress(function(e) {
+	    if (e.which == 13) {
+	    	$( "#login-btn" ).trigger( "click" );
+	    }
+  	});
+	$("#login-btn").click(function(){
+		var username = $("#username").val();
+		var password = $("#password").val();
+		var captcha = $("#captcha").val()
+		var isRememberMe = $('#remember-me').prop("checked") == true;
+		if(validate(username,password,captcha)) {
+			//$("#overlay").show();
+			$.ajax({
+				type: "POST"
+				,url: "/api/auth/login"
+				,headers: {
+					"Content-Type": "application/json"
+					,"X-HTTP-Method-Override": "POST"
+				}
+				,data: JSON.stringify({
+					username: username
+					,password: password
+					,isRememberMe:isRememberMe
+					,captcha:captcha
+				})
+				,dataType: "json"
+				,success: function(data) {
+					if(data.status == 200) {
+						$("#overlay").hide();
+						window.location.href = "/example/post/list";
+					}
+				}
+				,error: function(xhr) {
+					//$("#overlay").hide();
+			        if(xhr.responseJSON.data && xhr.responseJSON.data.signal) {
+			        	switch(xhr.responseJSON.data.signal) {
+			        		case "resetFailedLogin":
+			        			$("#captcha-group").hide();
+			        			break
+				        	case "createCaptcha":
+				        		$("#captcha-group").show();
+				        		$("#captcha-group img").attr("src","data:image/png;base64,"+xhr.responseJSON.data.captchaEncode)
+				        		$("#captcha").val('');
+				        		if(xhr.responseJSON.status==403) {
+				        			dispError($("#valid-captcha"), xhr.responseJSON.message);
+				        			return;
+				        		}
+				        		break;
+			        	}
+			        }
+			        if(xhr.responseJSON.message && xhr.responseJSON.message!='') {
+			        	Swal.fire({
+							position: 'center',
+				            title: xhr.responseJSON.message,
+				            type: 'warning',
+				            showConfirmButton: false,
+				            timer:2000,
+				            width:550
+				        })
+			        }
+				}
+			});
+		}
+	});
+
+	$("#username").change(function(e) {
+		if(e.target != "") {
+			hideError($("#valid-username"));
+		}
+	});
+	$("#password").change(function(e) {
+		if(e.target != "") {
+			hideError($("#valid-password"));
+		}
+	});
+	$("#captcha").change(function(e) {
+		if(e.target != "") {
+			hideError($("#valid-captcha"));
+		}
+	});
+});
+function validate(username,password,captcha) {
+	var isValid = true;
+	if(username == "") {
+		dispError($("#valid-username"), "Please enter your username!")
+		isValid = false;
+	}
+
+	if(password == "") {
+		dispError($("#valid-password"), "Please enter your password!")
+		isValid = false;
+	}
+	if($('#captcha-group').is(':visible') && captcha == "") {
+		dispError($("#valid-captcha"), "Please enter the captcha!")
+		isValid = false;
+	}
+	return isValid;
+}
+
+</script>

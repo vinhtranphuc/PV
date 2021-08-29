@@ -1,0 +1,24 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.so.mybatis.example.mapper.CategoryMapper">
+
+	<!-- Open based on redis Secondary Cache -->
+<!--	<cache type="com.tranphucvinh.config.redis.IbatisRedisCache"/>-->
+
+    <select id="selectCategories" resultType="Map">
+        SELECT
+	        c.category_id,
+	        c.category_name,
+	        c.category_img_path,
+	        c.created_at,
+	        c.updated_at,
+	        c.created_user,
+	        c.updated_user,
+	        COUNT(p.post_id) AS postCnt
+        FROM
+        	tb_categories c
+        	LEFT JOIN tb_posts p
+        	ON c.category_id = p.category_id
+        GROUP BY c.category_id
+    </select>
+</mapper>

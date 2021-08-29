@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="kr" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<table class="table" style=" max-width: 827px; width: 100%; margin: 0 auto;">
+    <tr>
+        <th>
+            <div style="background: #03004d;; padding: 20px 0 20px 15%; text-align: left; ">
+                <img src="cid:logoEmail" alt="">
+            </div>
+        </th>
+    </tr>
+    <tr>
+        <td>
+            <h2 style="margin-top: 30px; margin-bottom: 0; padding: 0 15%; font-weight: 450; font-size: 22px; color: #464A53;" th:utext="${title}"></h2>
+        </td>
+    </tr>
+    <tr>
+        <td>
+        	<th:block th:each="line : ${contentLines}">
+		       <p style="margin-bottom: 0;margin-top: 0; padding: 0 15%; font-size: 16px; color: #ABAFB3;">[[${line}]]</p>
+		   </th:block>
+        </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr>
+        <td>
+            <div style=" padding: 0 15%;">
+                    <span style=" font-size: 16px; color: #ABAFB3;">
+                        Thanks,
+                    </span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div style="padding: 0 15%;">
+                    <span style=" font-size: 16px; color: #ABAFB3;">
+                        lifecode
+                    </span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div style=" padding: 0 15%;">
+                <p style=" font-size: 16px; color: #ABAFB3; border-top: 1px solid #CACCCF; padding-top: 15px;">
+                    © 2020 Lifecode.
+                </p>
+            </div>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

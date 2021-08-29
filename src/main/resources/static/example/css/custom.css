@@ -1,0 +1,132 @@
+#overlay {
+  position: fixed;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1060;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+#overlay .spinner-custom {
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	display: inline-block;
+	width: 2rem;
+	height: 2rem;
+	vertical-align: text-bottom;
+	border: .25em solid #e6e6e6;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation-name: overlay-spin;
+	animation-duration: 1000ms;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear; 
+}
+@keyframes overlay-spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}
+.fa.fa-calendar {
+	margin-top: 50% !important;
+}
+.no-sorting::after {
+	display: none!important; 
+}
+/* .no-sorting input[type="checkbox"] {
+margin-left: 12px !important;
+} */
+.dataTables_paginate {
+	padding: 8px !important;
+}
+.main_menu .fas {
+   width: 26px;
+   opacity: .99;
+   display: inline-block;
+   font-size: 18px;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+}
+.action-menu{
+	cursor:pointer;
+	position: relative;
+}
+.action-menu:before {
+	content: '\2807';
+}
+.action-menu ul {
+  display: none;
+  position: absolute;
+  width:80px;
+  margin: 0;
+  padding: 0;
+  background: #FFFFFF;
+  border-radius: 5px;
+  list-style: none;
+  box-shadow:
+    0 15px 35px rgba(50,50,90,0.1),
+    0 5px 15px rgba(0,0,0,0.07);
+  overflow: hidden;
+  z-index: 999999;
+  right: 15px;
+}
+.action-menu li {
+  border-left: 3px solid transparent;
+  transition: ease .2s;
+}
+.action-menu li a {
+  display: block;
+  padding: 10px;
+  color: #212529;
+  text-decoration: none;
+  transition: ease .2s;
+  cursor: pointer;
+}
+.action-menu ul li:hover {
+  background: #6495ED;
+  border-left: 3px solid #104E8B;
+  color:#ffffff
+}
+.fa.local {
+	font-family: FontAwesome;
+}
+.my-btn{
+	background-color: rgba(52, 73, 94, 0.94) !important;
+	color: #fff;
+	opacity: 1 !important;
+}
+.my-btn:hover {
+  	background-color: #2a3f5445 !important;
+ 	opacity: 1 !important;
+}
+button {
+	cursor: pointer;
+}
+.blur-color {
+	opacity: 0.7;
+}
+.ck-editor.ck-rounded-corners {
+    width: 100% !important;
+}
+.ck-content {
+	color: initial;
+	background: initial;
+	font-family: initial;
+	font-size: initial;
+	font-weight: initial;
+	line-height: initial;
+}
+.ck-content p {
+    margin-top: 0;
+    margin-bottom: 0rem;
+}

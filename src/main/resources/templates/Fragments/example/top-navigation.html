@@ -1,0 +1,32 @@
+<div class="top_nav">
+    <div class="nav_menu">
+        <div class="nav toggle">
+            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+        </div>
+        <nav class="nav navbar-nav">
+            <ul class=" navbar-right">
+                <li class="nav-item dropdown open" style="padding-left: 10px;padding-top: 5px;">
+                    <a href="javascript:;" class="user-profile dropdown-toggle"
+                       aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown"
+                       aria-expanded="false">
+                        <!-- <img src="images/img.jpg" alt=""> -->
+                        <span id="user_name_top"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-usermenu pull-right"
+                         aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/user">User Profile</a>
+                        <a class="dropdown-item" href="/auth/logout"><i class="fa fa-sign-out pull-right"></i> Log
+                            Out</a>
+                    </div>
+                </li>
+
+                <li role="presentation" class="nav-item dropdown open">
+                    <a>
+                        <img th:src="${#request.userPrincipal.principal.avatarImg == null||#request.userPrincipal.principal.avatarImg == ''?'/store/common/avatar-default.png':#request.userPrincipal.principal.avatarImg}"
+                             class="img-circle profile_img" style="width:30px; height:30px; margin-top:0">
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

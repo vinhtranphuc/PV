@@ -1,0 +1,64 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.so.mybatis.example.mapper.TagMapper">
+
+	<!-- Open based on redis Secondary Cache -->
+<!--	<cache type="com.tranphucvinh.config.redis.IbatisRedisCache"/>-->
+
+    <select id="selectTags" resultType="Map">
+        SELECT
+	        tag_id,
+	        tag
+        FROM
+        	tb_tags
+    </select>
+
+    <select id="selectTagsByPostId" resultType="Map">
+        SELECT
+        	a.tag_id,
+        	a.tag
+        FROM
+        	tb_tags a JOIN tb_posts_tags b
+        	ON a.tag_id = b.tag_id
+		WHERE
+			b.post_id = #{postId}
+    </select>
+
+    <select id="selectTagById" resultType="Map">
+        SELECT
+        	a.tag_id,
+        	a.tag
+        FROM
+        	tb_tags a
+		WHERE
+			a.tag_id = #{tagId}
+    </select>
+
+    <insert id="insertIgnoreTag">
+    	INSERT IGNORE INTO tb_tags(
+	        tag
+    	) VALUES (
+    		#{tag}
+    	)
+    	<selectKey resultType="String" order="AFTER" keyProperty="tag_id">
+            SELECT tag_id AS id
+            FROM tb_tags
+            WHERE tag = #{tag}
+        </selectKey>
+    </insert>
+
+    <delete id="deleteTagsUnused">
+ 	    DELETE FROM tb_tags
+ 	    WHERE tag_id NOT IN (
+ 	    	SELECT
+ 	    		tag_id
+ 	    	FROM (
+				SELECT
+					a.tag_id
+				FROM tb_tags a JOIN tb_posts_tags b
+				ON a.tag_id = b.tag_id
+				GROUP BY a.tag_id
+			) AS t
+		)
+    </delete>
+</mapper>

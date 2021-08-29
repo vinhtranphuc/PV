@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+    	<div id="overlay">
+			<div class="spinner-custom" style="top: 40%;left: 57%;" role="status">
+			</div>
+		</div>
+        <div class="col-md-3 left_col">
+            <div class="left_col scroll-view">
+                <!-- <div class="navbar nav_title" style="border: 0;">
+                  <a href="index" class="site_title"><i class="fa fa-paw"></i> <span>SI Intro</span></a>
+                </div> -->
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div th:replace="~{../Fragments/example/menu-profile}"></div>
+                <!-- /menu profile quick info -->
+
+                <br/>
+
+                <!-- sidebar menu -->
+                <div th:replace="~{../Fragments/example/sidebar}"></div>
+                <!-- /sidebar menu -->
+
+                <!-- /menu footer buttons -->
+                <!-- <div th:replace="~{Fragments/example/footer-menu}"></div> -->
+                <!-- /menu footer buttons -->
+            </div>
+        </div>
+
+        <!-- top navigation -->
+        <div th:replace="~{../Fragments/example/top-navigation}"></div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div layout:fragment="content"></div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="~{../Fragments/example/footer}"></div>
+        <!-- /footer content -->
+    </div>
+</div>
+</body>
+<script th:replace="~{../Fragments/example/scripts}"></script>
+</html>

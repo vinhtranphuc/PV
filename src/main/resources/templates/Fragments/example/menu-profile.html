@@ -1,0 +1,10 @@
+<div class="profile clearfix" style="width: 230px;">
+    <div class="profile_pic">
+        <img th:src="${#request.userPrincipal.principal.avatarImg == null||#request.userPrincipal.principal.avatarImg == ''?'/store/common/avatar-default.png':#request.userPrincipal.principal.avatarImg}"
+             alt="..." class="img-circle profile_img" style="width:60px; height:60px;">
+    </div>
+    <div class="profile_info">
+        <span>Welcome,</span>
+        <h2><span id="user_name_bar" th:text="${#request.userPrincipal.principal.fullName}"></span></h2>
+    </div>
+</div>

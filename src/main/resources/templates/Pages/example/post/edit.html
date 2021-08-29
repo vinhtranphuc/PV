@@ -1,0 +1,486 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{../Layouts/example-layout}">
+<head th:include="~{../Fragments/example/head :: title('Post List')}">
+    <style layout:fragment="styles">
+    	.initial {
+  			all: initial;
+		}
+    	.ck-editor__editable_inline {
+		    min-height: 450px;
+		}
+		.ck-editor.ck-rounded-corners {
+		    width: 100% !important;
+    		margin-top: 2% !important;
+		}
+	    .ck-content {
+	    	color: initial;
+		    background: initial;
+		    font-family: initial;
+		    font-size: initial;
+		    font-weight: initial;
+		    line-height: initial;
+	    }
+		.ck-content p {
+		    margin-top: 0;
+		    margin-bottom: 0rem;
+		}
+		#thumbnail-list {
+		    height: 100%;
+		    white-space: nowrap;
+		    overflow-x: scroll;
+		    overflow-y: hidden;
+		}
+		.image {
+		    position: relative;
+		    display: inline-block;
+		    margin: 8px 8px;
+		    box-shadow: 2px 2px 4px #bbb;
+		    border-top-right-radius: 4px;
+	        width: 300px;
+		    height: 85%;
+		    vertical-align: bottom;
+		    background-position: top left;
+		    background-repeat: no-repeat;
+		    background-size: cover;
+		}
+		.image .tools {
+	        text-transform: uppercase;
+		    color: #fff;
+		    text-align: center;
+		    position: relative;
+		    font-size: 30px;
+		    padding: 3px;
+		    background: rgba(0, 0, 0, 0.35);
+		    margin: 80px 0 0 0;
+		}
+		#add-image {
+		    position: relative;
+		    display: inline-block;
+		    box-shadow: 2px 2px 4px #bbb;
+		    border-radius: 5px;
+		    width: 70px;
+		    height: 85%;
+		    margin-top: 30%;
+		    vertical-align: bottom;
+		    background-position: top left;
+		    background-repeat: no-repeat;
+		    background-size: cover;
+		    background-color: #e7e7e7;
+		    padding: 80% 0 0 25px;
+		    cursor: pointer;
+		}
+		#add-image i {
+			font-size: 25px;
+		}
+		.amsify-remove-tag {
+			font-size: 12px !important;
+		}
+		div.amsify-suggestags-area {
+			width:100%
+		}
+    </style>
+    <th:block layout:fragment="others">
+    	<!-- CDN links -->
+		<link rel="stylesheet" type="text/css" href="/example/css/amsify.suggestags.css"></link>
+		<!-- Amsify Plugin -->
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a onclick="return false;"><i class="fas fa-pen-nib"></i>&ensp;Page Setting</a></li>
+            <li class="breadcrumb-item"><a href="/example/post/edit">Edit Post</a></li>
+        </ol>
+    </nav>
+    <div class="row" style="min-height: 85vh;">
+        <div class="col-md-12 col-sm-12 ">
+            <div class="x_panel h-100">
+                <div class="x_title">
+                    <h2>Edit Post</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="row">
+                    	<div class="col-md-2">
+						</div>
+                    	<div class="col-md-6">
+                  		   <div class="form-group row p-3">
+						    <input type="text" class="form-control" th:value="${post.title}" id="post-title" placeholder="Title"></input>
+						    <div id="editor" class="x-editor editor" th:utext="${post.content}">
+						    </div>
+						  </div>
+                    	</div>
+                    	<div class="col-md-2 pt-3">
+                    		<div class="form-group row pr-3 pl-3">
+                    			<button type="button" class="btn btn-success active w-100 blur-color" id="save-post">Edit</button>
+                    			<!-- <button type="button" class="btn btn-primary active w-100">Preview</button> -->
+                    		</div>
+                    		<div class="form-group row pr-3 pl-3">
+							  <label for="published-at">Published At</label>
+                              <div class='input-group date'>
+                                <input type='text' id="published-at" th:value="${post.published_at}" class="form-control"></input>
+	                            <span class="input-group-addon">
+	                               <span class="fa fa-calendar"></span>
+	                            </span>
+                              </div>
+							</div>
+                    		<div class="form-group row pr-3 pl-3">
+							    <label for="categories">Categories</label>
+							    <select class="form-control" id="categories">
+								      <option th:each="category:${categories}"
+								      	th:value="${category.category_id}"
+								      	th:selected=${category.isSelected}
+								      	th:text="${category.category_name}">
+								      </option>
+							    </select>
+						  </div>
+						  <div class="form-group row pr-3 pl-3">
+							 <label for="post-language">Language</label>
+							 <select
+								class="form-control" id="post-language">
+								<option value="EN-US" th:selected="${post.language == 'EN-US'}">EN-US</option>
+								<option value="VNI" th:selected="${post.language == 'VNI'}">VNI</option>
+							</select>
+						  </div>
+						  <div class="form-group row pr-3 pl-3">
+							    <label for="tags">Tags :&ensp;</label>
+							    <input type="text" class="form-control w-100" id="tags" th:value="${post.postTagsStr}"></input>
+						  </div>
+						  <th:block th:if="${isSupperAdmin == true}">
+                          	<div class="form-group row p-3">
+							    <label for="level-p">Level :&ensp;&ensp;&ensp;</label>
+								<p id="level-p">
+									<h6 class="mr-2">1</h6>
+									<input type="radio" class="flat mr-3" name="post-level" id="post-level-1" value="1" th:checked="${post.level==1?'true':'false'}" required />
+									<h6 class="mr-2 ml-5">2</h6>
+									<input type="radio" class="flat" name="post-level" id="post-level-2" th:checked="${post.level==2?'true':'false'}" value="2" />
+								</p>
+						  	</div>
+                          </th:block>
+                    	</div>
+                    </div>
+                    <div class="row" style="height: 300px;">
+                   	  <div class="col-md-2">
+					  </div>
+				  	  <div class="col-lg-3 col-md-3 pl-3 pr-3">
+				  	  	<label for="summary">Summary</label>
+                             <textarea th:text="${post.summary}" rows="6" id="summary" required="required" class="form-control"
+                                        name="summary" data-parsley-trigger="keyup"></textarea>
+                         </div>
+                         <div class="col-lg-5 col-md-5 pl-3 pr-3">
+                         	  <label for="thumnails">Thumbnails  ( <input type="checkbox" id="hasImagesOntop" th:checked="${post.has_images_ontop}"></input> add images to top)
+                        	  		<span id="images-layout" th:style="${post.has_images_ontop?'':'display: none;'}" >
+										<input type="radio" name="images_layout" th:checked="${post.images_layout=='1'}" value="1"/>&nbsp;slide&nbsp;
+										<input type="radio" name="images_layout" th:checked="${post.images_layout=='2'}" value="2"/>&nbsp;2 columns&nbsp;
+										<input type="radio" name="images_layout" th:checked="${post.images_layout=='3'}" value="3"/>&nbsp;3 columns&nbsp;
+										<input type="radio" name="images_layout" th:checked="${post.images_layout=='4'}" value="4"/>&nbsp;4 columns
+									</span>
+                         	  </label>
+                             <div id="thumbnail-list">
+                             	<div th:each="image:${post.postImages}" class="image view view-first" th:style="'background-image: url('+${image.image_path}+')'">
+						        <div class="tools tools-bottom">
+						            <a href="#" onClick="showImage(this); return false;"><i class="fa fa-eye"></i></a>
+						            <a href="#" onClick="removeImage(this); return false;"><i class="fa fa-times"></i></a>
+						        </div>
+						    </div>
+                             </div>
+                         </div>
+                         <div class="col-lg-1 col-lg-1">
+                             <div id="add-image">
+                                 <i class="fa fa-plus"></i>
+                             </div>
+                             <input type="file" id="selectImage" style="display: none;">
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/example/js/ckeditor5-build-classic-plus/ckeditor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript" src="/example/js/jquery.amsify.suggestags.js"></script>
+<script>
+var myEditor = {};
+$(document).ready(function(){
+	ClassicEditor.create( document.querySelector('#editor'),{
+	    extraPlugins: [MyCustomUploadAdapterPlugin],
+	}).then( editor => {
+		myEditor = editor;
+	}).catch(err => {
+	    console.error(err.stack);
+	});
+
+	$('#published-at').datetimepicker({
+        format: 'YYYY-MM-DD',
+        showClear: true,
+        useStrict: true,
+        keepInvalid: false,
+    });
+	$('#add-image').click(function() {
+		$('#selectImage')[0].click();
+	});
+	$('#hasImagesOntop').change(function() {
+	    if(this.checked) {
+	    	$('#images-layout').show();
+	    } else {
+	    	$('#images-layout').hide();
+	    }
+	});
+
+	$('#selectImage').change(function() {
+		var input = $(this);
+		addImage(input);
+		$('#selectImage').val("");
+	});
+	$('input[name="country"]').amsifySuggestags({
+		type : 'materialize'
+	});
+
+	$('#summary').on('keypress', function(e) {
+	  const maxRows = Number($(this).attr('rows'));
+	  const currRows = $(this).val().split("\n").length;
+	  if (maxRows === currRows && e.key === 'Enter') {
+	    e.preventDefault();
+	  }
+	});
+	var tagsStr = "[[${tagsStr}]]";
+	var tagArr = tagsStr.split(",");
+	$('#tags').amsifySuggestags({
+		type : 'materialize',
+		suggestions : tagArr
+	});
+
+	$('#save-post').click(function() {
+		var postTitle = $('#post-title').val();
+		var categoryId = $('#categories').val();
+		var content = myEditor.getData();
+		var summary = $('#summary').val();
+		var thumbnailList = [];
+		$("#thumbnail-list").find(".image").each(function(e) {
+		    var image = this.style.backgroundImage;
+		    var imageData = image.slice(5, (image.length-2));
+		    thumbnailList.push(imageData);
+		});
+		var tagStr = $('#tags').val()==''?'':$('#tags').val();
+		var tagArr = tagStr.split(',');
+		var publishedAt = $('#published-at').val();
+		var level = $('input[name=post-level]').length>0?$('input[name=post-level]:checked').val():2;
+		var hasImagesOntop = $('#hasImagesOntop').prop('checked') == true?1:0;
+
+		var language = $('#post-language').val();
+
+		validate(postTitle, categoryId, content,summary,thumbnailList)
+		&&savePost(postTitle, categoryId,language, content,summary,thumbnailList,tagArr,publishedAt,level,hasImagesOntop);
+	});
+});
+function validate(postTitle, categoryId, content,summary,thumbnailList) {
+	var message = "";
+	if(postTitle == '') {
+		message = 'Please input the post title!';
+	} else if(categoryId == '') {
+		message = 'Please select a category!';
+	} else if(content == '') {
+		message = 'Please input the content!';
+	} else if(summary == '') {
+		message = 'Please input the sumary!';
+	} else if(thumbnailList.length < 1) {
+		message = 'Please add thumbnail';
+	}
+	if(message != '') {
+		Swal.fire({
+			position: 'center',
+	        title: message,
+	        type: 'warning',
+	        showConfirmButton: false,
+	        timer:2000,
+	        width:550
+	    });
+		return false;
+	}
+	return true;
+}
+function savePost(postTitle, categoryId, language, content,summary,thumbnailList,tagArr,publishedAt,level, hasImagesOntop) {
+	$("#overlay").show();
+	var postId = "[[${post.post_id}]]";
+	var imagesLayout = 0;
+	if(hasImagesOntop) {
+		var imagesLayout = $("input[type='radio'][name='images_layout']:checked").val();
+	}
+	$.ajax({
+		type: "PUT"
+		,url: "/example/api/post/edit"
+		,headers: {
+			"Content-Type": "application/json"
+			,"X-HTTP-Method-Override": "PUT"
+		}
+		,data: JSON.stringify({
+			post_id:postId
+			,title:postTitle
+			,category_id:categoryId
+			,language:language
+			,content:content
+			,summary:summary
+			,published_at:publishedAt
+			,thumbnailList:thumbnailList
+			,tagList:tagArr
+			,level:level+""
+			,hasImagesOntop:hasImagesOntop
+			,imagesLayout:imagesLayout
+		})
+		,dataType: "json"
+		,success: function(data) {
+			$("#overlay").hide();
+			if(data.status == 200) {
+				Swal.fire({
+					position: 'center',
+		            title: data.message,
+		            type: 'success',
+		            showConfirmButton: false,
+		            timer:2000,
+		            width:550
+		        });
+				location.reload();
+			}
+		}
+		,error: function(xhr) {
+			$("#overlay").hide();
+			if(xhr.responseJSON && xhr.responseJSON.message!='') {
+				ALERT.warning(xhr.responseJSON.message);
+	        }
+		}
+	});
+}
+class UploadImgAdapter {
+    constructor(loader, url) {
+        this.loader = loader;
+        this.url = url;
+    }
+    upload() {
+        return this.loader.file
+            .then( file => new Promise( ( resolve, reject ) => {
+                  var myReader= new FileReader();
+                  myReader.onloadend = (e) => {
+                     resolve({ default: myReader.result });
+                  }
+                  myReader.readAsDataURL(file);
+            }));
+    }
+    abort() {
+        if (this.xhr) {
+            this.xhr.abort();
+        }
+    }
+    _initRequest() {
+        const xhr = (this.xhr = new XMLHttpRequest());
+        xhr.open("POST", this.url, true);
+        xhr.responseType = "json";
+    }
+
+    // Initializes XMLHttpRequest listeners.
+    _initListeners(resolve, reject) {
+        const xhr = this.xhr;
+        const loader = this.loader;
+        const genericErrorText = "Couldn't upload file:" + ` ${loader.file.name}.`;
+        xhr.addEventListener("error", () => reject(genericErrorText));
+        xhr.addEventListener("abort", () => reject());
+        xhr.addEventListener("load", () => {
+            const response = xhr.response;
+            if (!response || response.error) {
+                return reject(
+                    response && response.error ? response.error.message : genericErrorText
+                );
+            }
+            resolve({
+                default: response.url
+            });
+        });
+        if (xhr.upload) {
+            xhr.upload.addEventListener("progress", (evt) => {
+                if (evt.lengthComputable) {
+                    loader.uploadTotal = evt.total;
+                    loader.uploaded = evt.loaded;
+                }
+            });
+        }
+    }
+
+    _sendRequest() {
+        // Prepare the form data.
+        const data = new FormData();
+        const api_key = "XXXXXXXXXXX";
+        const transformation = "w_512";
+        const timestamp = Date.now();
+    }
+  }
+function MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get( 'FileRepository' ).createUploadAdapter = ( loader ) => {
+        return new UploadImgAdapter( loader );
+    };
+}
+function addImage(input) {
+    if (input[0].files && input[0].files[0]) {
+        var reader = new FileReader();
+        if(input[0].files[0] && (input[0].files[0].size / 1024 / 1024) > 10) {
+			Swal.fire({
+				position: 'center',
+		        title: 'Please select an image size of less than 10MB!',
+		        type: 'warning',
+		        showConfirmButton: false,
+		        timer:2000,
+		        width:550
+		    });
+			return;
+        }
+        reader.readAsDataURL(input[0].files[0]);
+        reader.onload = function (e) {
+
+        	// add base64 img
+        	var frmImageBase64 = $("#frmImageBase64").html();
+	        var template = Handlebars.compile(frmImageBase64+"");
+	        var base64Data = e.target.result;
+	        var newImageFrm = template({base64Data});
+	        $("#thumbnail-list").append(newImageFrm);
+
+	        // scroll to new img
+	        var lastImg =  $("#thumbnail-list").find('.image')[ $("#thumbnail-list").find('.image').length-1];
+	        $("#thumbnail-list").animate({scrollLeft: $(lastImg).position().left}, 1);
+	        if($("#thumbnail-list").find('.view').size() < 15) {
+	        	$("#add-image").show();
+	        } else {
+	        	$("#add-image").hide();
+	        }
+        }
+    }
+}
+function showImage(e) {
+	var bgImg = $(e).closest('.view')[0].style.backgroundImage;
+	var imageData = bgImg.slice(5, (bgImg.length-2)); //remove url()
+	let w = window.open('about:blank');
+	let image = new Image();
+	image.src = imageData;
+	setTimeout(function(){
+	  w.document.write(image.outerHTML);
+	}, 0);
+}
+function removeImage(e) {
+	$(e).closest('.view').remove();
+	if($("#thumbnail-list").find('.view').size() < 15) {
+    	$("#add-image").show();
+    } else {
+    	$("#add-image").hide();
+    }
+}
+</script>
+<script id="frmImageBase64" type="text/x-handlebars-template">
+    <div class="image view view-first" style="background-image: url({{base64Data}})">
+        <div class="tools tools-bottom">
+            <a href="#" onClick="showImage(this); return false;"><i class="fa fa-eye"></i></a>
+            <a href="#" onClick="removeImage(this); return false;"><i class="fa fa-times"></i></a>
+        </div>
+    </div>
+</script>

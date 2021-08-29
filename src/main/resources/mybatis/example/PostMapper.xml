@@ -1,0 +1,243 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.so.mybatis.example.mapper.PostMapper">
+
+	<!-- Open based on redis Secondary Cache -->
+	<!-- <cache type="com.so.config.redis.IbatisRedisCache"/> -->
+
+	 <sql id="sqlPost">
+	 	p.post_id,
+ 		p.title,
+        p.category_id,
+        p.language,
+        c.category_name,
+        p.content,
+        p.level,
+        p.summary,
+        p.has_images_ontop,
+        p.images_layout,
+        p.times_of_view,
+        DATE_FORMAT(p.published_at,'%Y-%m-%d') published_at,
+        DATE_FORMAT(p.created_at,'%Y-%m-%d') created_at,
+        DATE_FORMAT(p.updated_at,'%Y-%m-%d') updated_at,
+        (SELECT username FROM tb_users WHERE user_id = p.created_user) AS created_username,
+        (SELECT username FROM tb_users WHERE user_id = p.updated_user) AS updated_username
+	 </sql>
+
+	  <sql id="sqlFromPost">
+	  	FROM
+	     	tb_posts p
+	     	JOIN tb_categories c
+	     	ON p.category_id = c.category_id
+	     	JOIN tb_users u
+			ON p.created_user = u.user_id
+			JOIN tb_user_roles ur
+			ON u.user_id = ur.user_id
+			JOIN tb_roles r ON ur.role_id = r.role_id
+	     WHERE
+	     	CASE
+				WHEN #{role} = 'ROLE_SUPPER_ADMIN' THEN TRUE
+				WHEN #{role} = 'ROLE_ADMIN' THEN r.role_id &lt;&gt; 1
+				WHEN #{role} = 'ROLE_USER' THEN r.role_id = 3
+			END
+	  </sql>
+
+	  <sql id="sqlFromDeletePosts">
+    	FROM
+	    	tb_posts p LEFT JOIN  tb_post_images pi
+				ON p.post_id = pi.post_id
+			LEFT JOIN tb_posts_tags pt
+				ON p.post_id = pt.post_id
+			LEFT JOIN tb_tags t
+				ON pt.tag_id = t.tag_id
+			LEFT JOIN tb_comments cmt
+				ON p.post_id = cmt.post_id
+			JOIN tb_users u
+				ON p.created_user = u.user_id
+			JOIN tb_user_roles ur
+				ON u.user_id = ur.user_id
+			JOIN tb_roles r ON ur.role_id = r.role_id
+		WHERE
+			CASE
+				WHEN #{role} = 'ROLE_SUPPER_ADMIN'
+				THEN TRUE
+				WHEN #{role} = 'ROLE_ADMIN' THEN r.role_id &lt;&gt; 1
+				WHEN #{role} = 'ROLE_USER' THEN p.created_user = #{user_id}
+			  END
+			<foreach item="element" collection="postIdArr" open="AND p.post_id IN (" separator="," close=")">
+				#{element}
+			</foreach>
+     </sql>
+
+     <sql id="sqlPostList">
+	 	SELECT
+	 		<include refid="sqlPost"></include>
+	    FROM
+	     	tb_posts p
+	     	JOIN tb_categories c
+	     	ON p.category_id = c.category_id
+	     	JOIN tb_users u
+			ON p.created_user = u.user_id
+			JOIN tb_user_roles ur
+			ON u.user_id = ur.user_id
+			JOIN tb_roles r ON ur.role_id = r.role_id
+	     WHERE
+	     	CASE
+				WHEN #{role} = 'ROLE_SUPPER_ADMIN' THEN TRUE
+				WHEN #{role} = 'ROLE_ADMIN' THEN r.role_id &lt;&gt; 1
+				WHEN #{role} = 'ROLE_USER' THEN r.role_id = 3
+			END
+     </sql>
+
+	 <select id="selectPostById" resultType="Map">
+	 	SELECT
+	 		<include refid="sqlPost"></include>
+	    <include refid="sqlFromPost"></include>
+	     	AND p.post_id = #{postId}
+	 </select>
+
+	 <select id="selectPostList" resultType="Map">
+	 	<include refid="sqlPostList"></include>
+	 </select>
+
+	 <select id="selectPostImagesById" resultType="Map">
+	 	SELECT
+	 		image_id
+	 		,post_id
+	 		,image_path
+	 		,standard_image_path
+	 		,small_image_path
+ 	 	FROM tb_post_images
+ 	 	WHERE post_id = #{post_id}
+ 	 	ORDER BY image_id
+	 </select>
+
+     <insert id="insertPost">
+    	INSERT INTO tb_posts(
+    		title,
+	        category_id,
+	        language,
+	        level,
+	        summary,
+	        has_images_ontop,
+	        images_layout,
+	        times_of_view,
+	        like_cnt,
+	        published_at,
+	        created_user,
+	        created_at
+    	) VALUES (
+    		#{title},
+	        #{category_id},
+            #{language},
+	        #{level},
+	        #{summary},
+	        #{hasImagesOntop},
+	        #{imagesLayout},
+	        0,
+	        0,
+	        IFNULL(NULLIF(#{published_at},''), NOW()),
+	        #{user_id},
+	        NOW()
+    	)
+    	<selectKey resultType="String" order="AFTER" keyProperty="post_id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <insert id="insertIgnorePostsTags">
+    	INSERT IGNORE INTO tb_posts_tags (
+    		post_id,
+    		tag_id
+    	) VALUES (
+    		#{post_id},
+	        #{tag_id}
+    	)
+    </insert>
+
+    <delete id="deletePostTagsUnused">
+    	DELETE FROM tb_posts_tags
+    	WHERE
+    		post_id = #{post_id}
+    	<foreach item="element" collection="tagIdList" open="AND tag_id NOT IN (" separator="," close=")">
+             #{element}
+        </foreach>
+    </delete>
+
+    <insert id="insertPostImages">
+    	INSERT INTO tb_post_images (
+    		post_id,
+    		image_path,
+    		standard_image_path,
+    		small_image_path
+    	) VALUES (
+    		#{post_id},
+	        #{image_path},
+	        #{standard_image_path},
+	        #{small_image_path}
+    	)
+    </insert>
+
+    <delete id="deletePostImagesUnused">
+    	DELETE FROM tb_post_images
+    	WHERE
+    		post_id = #{post_id}
+    	<foreach item="element" collection="thumbnailPathList" open="AND image_path NOT IN (" separator="," close=")">
+             #{element}
+        </foreach>
+    </delete>
+
+    <update id="updatePostContentById">
+    	UPDATE tb_posts
+    	SET
+	        content = #{content}
+	    WHERE
+	    	post_id = #{post_id}
+    </update>
+
+    <update id="updatePost">
+    	UPDATE tb_posts
+    	SET
+    		title = #{title}
+	        ,category_id = #{category_id}
+	        ,language = #{language}
+	        ,content = #{content}
+	        ,level = #{level}
+	        ,summary = #{summary}
+	        ,has_images_ontop = #{hasImagesOntop}
+	        ,images_layout = #{imagesLayout}
+	        ,published_at = IFNULL(NULLIF(#{published_at},''), published_at)
+	        ,updated_at = NOW()
+	        ,updated_user = #{user_id}
+	    WHERE
+	    	post_id = #{post_id}
+    </update>
+
+	<delete id="deletePostTagsByPostId">
+		<if test="postIdArr.size() > 0">
+			DELETE pt
+			<include refid="sqlFromDeletePosts"></include>
+		 </if>
+	</delete>
+
+	<delete id="deletePostImagesByPostId">
+		<if test="postIdArr.size() > 0">
+			DELETE pi
+			<include refid="sqlFromDeletePosts"></include>
+		 </if>
+	</delete>
+
+	<delete id="deleteCommentsByPostId">
+		<if test="postIdArr.size() > 0">
+			DELETE cmt
+			<include refid="sqlFromDeletePosts"></include>
+		 </if>
+	</delete>
+
+    <delete id="deletePosts">
+		<if test="postIdArr.size() > 0">
+			DELETE p
+			<include refid="sqlFromDeletePosts"></include>
+		 </if>
+	</delete>
+</mapper>

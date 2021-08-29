@@ -1,0 +1,69 @@
+<head th:fragment="title(name)">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/example/images/favicon.png" type="image/ico"/>
+
+    <title th:text="${name}"></title>
+
+    <!-- Bootstrap -->
+    <link href="cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+    <link href="/example/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/example/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/example/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="/example/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- bootstrap-progressbar -->
+    <link href="/example/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="/example/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <!-- bootstrap-daterangepicker -->
+    <link href="/example/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- bootstrap-datetimepicker -->
+    <link href="/example/vendors/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="/example/css/custom-theme.css" rel="stylesheet">
+
+    <!-- Custom -->
+    <link href="/example/css/custom.css" rel="stylesheet">
+
+    <!-- Datatables -->
+    <link href="/example/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="/example/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+    <link href="/example/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+    <link href="/example/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+    <link href="/example/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+    <!-- Datatables -->
+
+    <!-- sweetalert2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.all.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.min.css">
+    <!-- /sweetalert2 -->
+
+
+    <!-- Custom datatable -->
+    <script src="/example/js/datatable-custom.js"></script>
+    <!-- Custom datatable -->
+
+    <!-- jQuery -->
+    <script src="/example/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- jQuery -->
+
+    <!-- fontawesome kit -->
+    <script src='/example/js/fontawesome-kit.js'></script>
+    <!-- fontawesome kit -->
+
+   	<!-- common -->
+    <script src="/common/js/common.js"></script>
+    <script src="/common/js/alert-utils.js"></script>
+    <!-- common -->
+
+    <link href="/example/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
+    <style layout:fragment="styles"></style>
+    <th:block layout:fragment="others"></th:block>
+</head>
